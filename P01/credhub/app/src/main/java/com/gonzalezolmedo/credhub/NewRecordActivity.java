@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.gonzalezolmedo.credhub.repository.RetrieveCredentialListTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public class NewRecordActivity extends AppCompatActivity {
 
         // Check whether the application is a system app or if it is installed by the user
         for (ApplicationInfo installedApp : installedApps) {
-            if ((installedApp.flags & ApplicationInfo.FLAG_SYSTEM) == 0 && installedApp.name != null){
+            if (installedApp.packageName != null){
                 installedAppsNames.add(installedApp.packageName);
                 Log.i(TAG, "populateSpinner: added non-system app " + installedApp.name);
             }

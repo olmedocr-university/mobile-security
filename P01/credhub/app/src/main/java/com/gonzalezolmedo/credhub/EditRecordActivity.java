@@ -12,10 +12,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.gonzalezolmedo.credhub.model.Credential;
+import com.gonzalezolmedo.credhub.repository.ExportCredentialTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 public class EditRecordActivity extends AppCompatActivity {
+    private String mIdentifier;
+    private String mUsername;
     private String mPassword;
     private String TAG = "EditRecordActivity";
 
@@ -24,11 +32,31 @@ public class EditRecordActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_item_export:
                 Log.i(TAG, "onOptionsItemSelected: exporting current credential");
+                boolean isExported = false;
+                try {
+                    isExported = new ExportCredentialTask().execute(mIdentifier, mUsername, mPassword).get(5, TimeUnit.SECONDS);
+                } catch (ExecutionException e) {
+                    Log.e(TAG, "onOptionsItemSelected: execution exception while exporting record", e);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "onOptionsItemSelected: connection interrupted", e);
+                } catch (TimeoutException e) {
+                    Log.e(TAG, "onOptionsItemSelected: timeout while exporting", e);
+                }
+
+                if (isExported) {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), "Success!", Snackbar.LENGTH_SHORT);
+                    snackbar.show();
+                } else {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), "Error while exporting credential", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+
                 return true;
             case android.R.id.home:
                 Log.i(TAG, "onOptionsItemSelected: going back");
                 this.onBackPressed();
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -51,10 +79,12 @@ public class EditRecordActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String mIdentifier = extras.getString("identifier");
-            textViewIdentifier.setText(mIdentifier);
-            textViewUsername.setText(extras.getString("username"));
+            mIdentifier = extras.getString("identifier");
+            mUsername = extras.getString("username");
             mPassword = extras.getString("password");
+
+            textViewIdentifier.setText(mIdentifier);
+            textViewUsername.setText(mUsername);
             getSupportActionBar().setTitle(mIdentifier);
         }
 

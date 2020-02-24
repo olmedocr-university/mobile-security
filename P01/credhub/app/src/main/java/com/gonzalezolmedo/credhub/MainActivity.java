@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private final int INTENT_REQUEST_CODE = 100;
+    private final int NEW_REQUEST_CODE = 100;
+    private final int IMPORT_REQUEST_CODE = 101;
 
     private String TAG = "MainActivity";
     private RecyclerView recyclerView;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.menu_item_import) {
             Log.i(TAG, "onOptionsItemSelected: importing credentials");
             Intent intent = new Intent(this, ImportActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, IMPORT_REQUEST_CODE);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), NewRecordActivity.class);
-                startActivityForResult(intent, INTENT_REQUEST_CODE);
+                startActivityForResult(intent, NEW_REQUEST_CODE);
             }
         });
 
@@ -89,12 +90,16 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i(TAG, "onActivityResult: returned from child with resultCode:" + resultCode);
         
-        if (resultCode == RESULT_OK && requestCode == INTENT_REQUEST_CODE) {
+        if (resultCode == RESULT_OK && requestCode == NEW_REQUEST_CODE) {
             Log.i(TAG, "onActivityResult: the user has edited the list, notifying the adapter");
             credentialsList = null;
             loadDataFromDatabase(database);
-            //FIXME: fails randomly
+            //FIXME: update recyclerview
             mAdapter.notifyDataSetChanged();
+        } else if (resultCode == RESULT_OK && requestCode == IMPORT_REQUEST_CODE) {
+            Log.i(TAG, "onActivityResult: credential correctly imported");
+            data.toString();
+            storeDataInDatabase(database);
         }
     }
 
@@ -137,6 +142,10 @@ public class MainActivity extends AppCompatActivity {
 
         cursor.close();
 
+    }
+
+    private void storeDataInDatabase(@NonNull SQLiteDatabase database) {
+        //TODO: update the db
     }
 
     private void loadIconsFromPhone() {
