@@ -55,8 +55,6 @@ public class ImportActivity extends AppCompatActivity {
 
                 if (mRemoteCredential != null) {
                     Log.i(TAG, "onClick: imported credential " + mRemoteCredential.toString());
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), "Success!", Snackbar.LENGTH_SHORT);
-                    snackbar.show();
 
                     Intent intent = new Intent();
                     intent.putExtra("identifier", mRemoteCredential.getIdentifier());

@@ -23,6 +23,7 @@ import com.gonzalezolmedo.credhub.database.CredentialsContract;
 import com.gonzalezolmedo.credhub.database.CredentialsDbHelper;
 import com.gonzalezolmedo.credhub.model.Credential;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -92,10 +93,14 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onActivityResult: returned from child with resultCode:" + resultCode);
 
         if (resultCode == RESULT_OK && requestCode == NEW_REQUEST_CODE) {
-            Log.i(TAG, "onActivityResult: the user has edited the list, notifying the adapter");
+            Log.i(TAG, "onActivityResult: the user has added a credential");
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), "Success creating credential", Snackbar.LENGTH_SHORT);
+            snackbar.show();
 
         } else if (resultCode == RESULT_OK && requestCode == IMPORT_REQUEST_CODE) {
             Log.i(TAG, "onActivityResult: credential correctly imported");
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), "Success importing credential", Snackbar.LENGTH_SHORT);
+            snackbar.show();
 
             Bundle extras = data.getExtras();
             if (extras != null) {

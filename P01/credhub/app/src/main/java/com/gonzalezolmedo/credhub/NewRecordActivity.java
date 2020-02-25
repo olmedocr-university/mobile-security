@@ -49,7 +49,6 @@ public class NewRecordActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-
     }
 
     @Override
@@ -67,6 +66,8 @@ public class NewRecordActivity extends AppCompatActivity {
 
         final EditText editTextUsername = findViewById(R.id.edit_text_username);
         final EditText editTextPassword = findViewById(R.id.edit_text_password);
+
+        System.out.println(editTextPassword.getHighlightColor());
 
         credentialsDbHelper = new CredentialsDbHelper(this);
         final SQLiteDatabase database = credentialsDbHelper.getWritableDatabase();
