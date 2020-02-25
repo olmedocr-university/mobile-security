@@ -59,7 +59,7 @@ public class ImportActivity extends AppCompatActivity {
                     snackbar.show();
 
                     Intent intent = new Intent();
-                    intent.putExtra("credentialID", mRemoteCredential.getIdentifier());
+                    intent.putExtra("identifier", mRemoteCredential.getIdentifier());
                     intent.putExtra("username", mRemoteCredential.getUsername());
                     intent.putExtra("password", mRemoteCredential.getPassword());
                     setResult(Activity.RESULT_OK, intent);

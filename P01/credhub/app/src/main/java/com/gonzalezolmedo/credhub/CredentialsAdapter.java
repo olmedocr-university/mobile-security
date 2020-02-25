@@ -2,7 +2,6 @@ package com.gonzalezolmedo.credhub;
 
 import android.content.Intent;
 import android.util.Log;
-import android.util.PrintWriterPrinter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +15,16 @@ import com.gonzalezolmedo.credhub.model.Credential;
 
 
 public class CredentialsAdapter extends RecyclerView.Adapter<CredentialsAdapter.CredentialViewHolder> {
-    private Credential[] mCredentials;
+    private static Credential[] mCredentials;
     private static String TAG = "CredentialsAdapter";
 
 
     // Provide a suitable constructor (depends on the kind of dataset)
     CredentialsAdapter(Credential[] credentials) {
+        mCredentials = credentials;
+    }
+
+    static void updateList(Credential[] credentials){
         mCredentials = credentials;
     }
 
@@ -37,9 +40,6 @@ public class CredentialsAdapter extends RecyclerView.Adapter<CredentialsAdapter.
     public void onBindViewHolder(@NonNull CredentialViewHolder holder, int position) {
         holder.bind(mCredentials[position]);
     }
-
-
-
 
     @Override
     public int getItemCount() {
@@ -73,6 +73,7 @@ public class CredentialsAdapter extends RecyclerView.Adapter<CredentialsAdapter.
 
             intent.putExtra("identifier", mCredential.getIdentifier());
             intent.putExtra("username", mCredential.getUsername());
+            intent.putExtra("password", mCredential.getPassword());
 
             v.getContext().startActivity(intent);
         }

@@ -4,7 +4,7 @@ import android.provider.BaseColumns;
 
 public final class CredentialsContract {
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 6;
     public static final String DATABASE_NAME = "Credentials.db";
 
     public CredentialsContract() { }

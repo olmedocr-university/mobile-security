@@ -1,5 +1,6 @@
 package com.gonzalezolmedo.credhub;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -23,6 +24,7 @@ import com.gonzalezolmedo.credhub.database.CredentialsDbHelper;
 import com.gonzalezolmedo.credhub.model.Credential;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
 
     private CredentialsDbHelper credentialsDbHelper;
-    private SQLiteDatabase database;
+    private SQLiteDatabase readableDatabase;
+    private SQLiteDatabase writableDatabase;
 
     private Credential[] credentialsList;
 
@@ -70,15 +73,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         credentialsDbHelper = new CredentialsDbHelper(this);
-        database = credentialsDbHelper.getReadableDatabase();
-        loadDataFromDatabase(database);
-        loadIconsFromPhone();
 
         recyclerView = findViewById(R.id.recycler_view_credentials);
-        recyclerView.setHasFixedSize(true);
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+
+        loadDataFromDatabase();
 
         mAdapter = new CredentialsAdapter(credentialsList);
         recyclerView.setAdapter(mAdapter);
@@ -89,18 +90,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i(TAG, "onActivityResult: returned from child with resultCode:" + resultCode);
-        
+
         if (resultCode == RESULT_OK && requestCode == NEW_REQUEST_CODE) {
             Log.i(TAG, "onActivityResult: the user has edited the list, notifying the adapter");
-            credentialsList = null;
-            loadDataFromDatabase(database);
-            //FIXME: update recyclerview
-            mAdapter.notifyDataSetChanged();
+
         } else if (resultCode == RESULT_OK && requestCode == IMPORT_REQUEST_CODE) {
             Log.i(TAG, "onActivityResult: credential correctly imported");
-            data.toString();
-            storeDataInDatabase(database);
+
+            Bundle extras = data.getExtras();
+            if (extras != null) {
+                String identifier = extras.getString("identifier");
+                String username = extras.getString("username");
+                String password = extras.getString("password");
+
+                storeDataInDatabase(identifier, username, password);
+            }
         }
+
+        loadDataFromDatabase();
     }
 
     @Override
@@ -109,8 +116,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void loadDataFromDatabase(@NonNull SQLiteDatabase database){
+    private void loadDataFromDatabase() {
         Log.i(TAG, "loadDataFromDatabase: getting credentials stored in the local DB");
+        readableDatabase = credentialsDbHelper.getReadableDatabase();
 
         String[] projection = {
                 CredentialsContract.CredentialEntry.COLUMN_NAME_ID,
@@ -118,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 CredentialsContract.CredentialEntry.COLUMN_NAME_PASSWORD
         };
 
-        Cursor cursor = database.query(
+        Cursor cursor = readableDatabase.query(
                 CredentialsContract.CredentialEntry.TABLE_NAME,   // The table to query
                 projection,                                       // The array of columns to return (pass null to get all)
                 null,                                        // The columns for the WHERE clause
@@ -130,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
         List<Credential> storedCredentials = new ArrayList<>();
 
-        while(cursor.moveToNext()) {
+        while (cursor.moveToNext()) {
             String identifier = cursor.getString(cursor.getColumnIndexOrThrow(CredentialsContract.CredentialEntry.COLUMN_NAME_ID));
             String username = cursor.getString(cursor.getColumnIndexOrThrow(CredentialsContract.CredentialEntry.COLUMN_NAME_USERNAME));
             String password = cursor.getString(cursor.getColumnIndexOrThrow(CredentialsContract.CredentialEntry.COLUMN_NAME_PASSWORD));
@@ -139,24 +147,35 @@ public class MainActivity extends AppCompatActivity {
         }
 
         credentialsList = storedCredentials.toArray(new Credential[0]);
+        loadIconsFromPhone();
+
+        if (mAdapter != null) {
+            CredentialsAdapter.updateList(credentialsList);
+            mAdapter.notifyDataSetChanged();
+        }
 
         cursor.close();
-
     }
 
-    private void storeDataInDatabase(@NonNull SQLiteDatabase database) {
-        //TODO: update the db
+    private void storeDataInDatabase(String id, String username, String password) {
+        Log.i(TAG, "storeDataInDatabase: saving imported credential in db");
+        writableDatabase = credentialsDbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(CredentialsContract.CredentialEntry.COLUMN_NAME_ID, id);
+        values.put(CredentialsContract.CredentialEntry.COLUMN_NAME_USERNAME, username);
+        values.put(CredentialsContract.CredentialEntry.COLUMN_NAME_PASSWORD, password);
+
+        // Insert the new row
+        readableDatabase.insertWithOnConflict(CredentialsContract.CredentialEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     private void loadIconsFromPhone() {
         for (Credential credential : credentialsList) {
-            try
-            {
+            try {
                 Drawable icon = getPackageManager().getApplicationIcon(credential.getIdentifier());
                 credential.setIcon(icon);
-            }
-            catch (PackageManager.NameNotFoundException e)
-            {
+            } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
         }

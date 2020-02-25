@@ -106,9 +106,9 @@ public class NewRecordActivity extends AppCompatActivity {
         for (ApplicationInfo installedApp : installedApps) {
             if (installedApp.packageName != null){
                 installedAppsNames.add(installedApp.packageName);
-                Log.i(TAG, "populateSpinner: added non-system app " + installedApp.name);
             }
         }
+        Log.i(TAG, "populateSpinner: finsihed popoulating spinner ");
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, installedAppsNames);

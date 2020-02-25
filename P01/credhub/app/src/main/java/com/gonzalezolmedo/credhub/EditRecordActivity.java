@@ -1,6 +1,8 @@
 package com.gonzalezolmedo.credhub;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -85,6 +87,8 @@ public class EditRecordActivity extends AppCompatActivity {
 
             textViewIdentifier.setText(mIdentifier);
             textViewUsername.setText(mUsername);
+            textViewPassword.setText("********");
+
             getSupportActionBar().setTitle(mIdentifier);
         }
 
@@ -95,19 +99,43 @@ public class EditRecordActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isVisible) {
-                    textViewPassword.setText("Hidden");
-                    isVisible = !isVisible;
+                    isVisible = hidePassword(textViewPassword, isVisible);
                 } else {
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), "Showing password", Snackbar.LENGTH_SHORT);
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), "Showing password for 5 seconds", Snackbar.LENGTH_SHORT);
                     snackbar.show();
 
                     textViewPassword.setText(mPassword);
                     isVisible = !isVisible;
+
+                    Thread clock = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(5000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } finally {
+                                isVisible = hidePassword(textViewPassword, isVisible);
+                            }
+                        }
+                    });
+
+                    clock.start();
                 }
             }
         });
 
 
+    }
+
+    @UiThread
+    public boolean hidePassword(final TextView textViewPassword, final boolean isVisible) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                textViewPassword.setText("********");
+            }
+        });
+        return !isVisible;
     }
 
     @Override
