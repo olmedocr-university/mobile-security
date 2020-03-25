@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CredHub</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="hash_salt">nJC0CJx4cS</string>
+    <string name="hashed_username">41f881f1c13801d4830555791875e4a64c3b6dcb8edb740a39d1847bb78e1eb9</string>
+    <string name="hashed_password">fbc216eb86bb83f21935f30b387ce73f46afffb260fa81b8ec71e8995787848d</string>
+</resources>
