@@ -30,7 +30,8 @@ public class ImportCredentialTask extends AsyncTask<String, Void, Credential> {
             androidHttpTransport = new HttpTransportSE("http://10.0.2.2:80/SDM/WebRepo?wsdl");
 
             headerList_basicAuth = new ArrayList<HeaderProperty>();
-            String strUserPass = "sdm" + ":" + "repo4droid";
+            SingletonCredential credentials = SingletonCredential.getInstance();
+            String strUserPass = credentials.username + ":" + credentials.password;
             headerList_basicAuth.add(new HeaderProperty("Authorization", "Basic " + org.kobjects.base64.Base64.encode(strUserPass.getBytes())));
 
             PropertyInfo propId = new PropertyInfo();
