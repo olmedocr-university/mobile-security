@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@id/coordinator_layout" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.google.android.material.appbar.AppBarLayout android:theme="@style/AppTheme.AppBarOverlay" android:id="@id/appBarLayout" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintTop_toTopOf="parent">
+        <include android:id="@id/toolbar" layout="@layout/toolbar" />
+    </com.google.android.material.appbar.AppBarLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout android:background="#ffffffff" android:padding="8.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent" app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+      xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+        <TextView android:textStyle="bold" android:id="@id/text_view_identifier_label" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="8.0dip" android:text="Identifier" app:layout_constraintTop_toTopOf="parent" />
+        <TextView android:id="@id/text_view_identifier" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="8.0dip" app:layout_constraintTop_toBottomOf="@id/text_view_identifier_label" />
+        <TextView android:textStyle="bold" android:id="@id/text_view_username_label" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="8.0dip" android:text="Username" app:layout_constraintTop_toBottomOf="@id/text_view_identifier" />
+        <TextView android:id="@id/text_view_username" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="8.0dip" app:layout_constraintTop_toBottomOf="@id/text_view_username_label" />
+        <TextView android:textStyle="bold" android:id="@id/text_view_password_label" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="8.0dip" android:text="Password" app:layout_constraintTop_toBottomOf="@id/text_view_username" />
+        <TextView android:id="@id/text_view_password" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_margin="8.0dip" app:layout_constraintTop_toBottomOf="@id/text_view_password_label" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton android:layout_gravity="end|bottom|center" android:id="@id/fab" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="16.0dip" android:src="@drawable/ic_remove_red_eye_white_24dp" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
