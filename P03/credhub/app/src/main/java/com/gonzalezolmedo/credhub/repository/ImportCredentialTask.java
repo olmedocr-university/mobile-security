@@ -13,9 +13,17 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class ImportCredentialTask extends AsyncTask<String, Void, Credential> {
     private final String TAG = "ImportCredentialTask";
@@ -27,7 +35,34 @@ public class ImportCredentialTask extends AsyncTask<String, Void, Credential> {
     @Override
     protected Credential doInBackground(String... credentialsIds) {
         try {
-            androidHttpTransport = new HttpTransportSE("http://10.0.2.2:80/SDM/WebRepo?wsdl");
+            TrustManager[] trustAllCerts = new TrustManager[] {
+                    new X509TrustManager() {
+                        @Override public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0]; }
+                        @Override public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) { }
+                        @Override public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) { }
+                    }
+            };
+            HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
+
+            // Initialize TLS context
+            SSLContext sc = null;
+            try {
+                sc = SSLContext.getInstance("TLSv1.2");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+            try {
+                sc.init(null, trustAllCerts, new java.security.SecureRandom()); // *Set 2nd argument to NULL for default trust managers
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            }
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Set HTTPS URL
+            androidHttpTransport = new HttpTransportSE("https://10.0.2.2/SDM/WebRepo?wsdl");
 
             headerList_basicAuth = new ArrayList<HeaderProperty>();
             SingletonCredential credentials = SingletonCredential.getInstance();

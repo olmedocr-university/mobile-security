@@ -1,8 +1,8 @@
 package com.gonzalezolmedo.credhub.database;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteOpenHelper;
 
 import static com.gonzalezolmedo.credhub.database.CredentialsContract.CredentialEntry.SQL_CREATE_ENTRIES;
 import static com.gonzalezolmedo.credhub.database.CredentialsContract.CredentialEntry.SQL_DELETE_ENTRIES;

@@ -4,29 +4,26 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteConstraintException;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.gonzalezolmedo.credhub.repository.RetrieveCredentialListTask;
+import com.gonzalezolmedo.credhub.repository.SingletonCredential;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.gonzalezolmedo.credhub.database.CredentialsDbHelper;
 import com.google.android.material.snackbar.Snackbar;
@@ -69,8 +66,11 @@ public class NewRecordActivity extends AppCompatActivity {
 
         System.out.println(editTextPassword.getHighlightColor());
 
+        SQLiteDatabase.loadLibs(this);
         credentialsDbHelper = new CredentialsDbHelper(this);
-        final SQLiteDatabase database = credentialsDbHelper.getWritableDatabase();
+
+        SingletonCredential credentials = SingletonCredential.getInstance();
+        final SQLiteDatabase database = credentialsDbHelper.getWritableDatabase(credentials.dbPassword);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -88,7 +88,7 @@ public class NewRecordActivity extends AppCompatActivity {
                     setResult(RESULT_OK, intent);
                     finish();
 
-                } catch (SQLException e) {
+                } catch (SQLiteException e) {
                     Log.e(TAG, "onClick: a constraint failed (probably a PK)", e);
                     Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinator_layout), "Error while saving credential into the DB, try again", Snackbar.LENGTH_LONG);
                     snackbar.show();
@@ -120,6 +120,4 @@ public class NewRecordActivity extends AppCompatActivity {
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
     }
-
-
 }
